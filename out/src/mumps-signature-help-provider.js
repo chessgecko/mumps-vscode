@@ -1,24 +1,22 @@
-let vscode = require('vscode');
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const vscode = require("vscode");
 let ParameterInformation = vscode.ParameterInformation;
 let Position = vscode.Position;
 let SignatureHelp = vscode.SignatureHelp;
 let SignatureInformation = vscode.SignatureInformation;
 let MumpsToken = require('./mumps-language-token').MumpsToken;
-
 class MumpsSignatureHelpProvider {
     provideSignatureHelp(document, position) {
         let line = document.lineAt(position);
         if (!line) {
             return;
         }
-
         let token = getFunctionToken(document, line, position);
         if (!token || !token.definition) {
             return;
         }
-
         let signature = createSignatureInformation(token.definition);
-
         let help = new SignatureHelp();
         help.signatures = [signature];
         help.activeSignature = 0;
@@ -27,7 +25,6 @@ class MumpsSignatureHelpProvider {
     }
 }
 exports.MumpsSignatureHelpProvider = MumpsSignatureHelpProvider;
-
 function getFunctionToken(document, line, position) {
     let depth = 1;
     let index;
@@ -35,17 +32,16 @@ function getFunctionToken(document, line, position) {
         let char = line.text.charAt(index);
         if (char === ')') {
             depth++;
-        } else if (char === '(') {
+        }
+        else if (char === '(') {
             depth--;
         }
     }
     if (depth > 0 || index <= 0) {
         return;
     }
-
     return new MumpsToken(document, new Position(position.line, index));
 }
-
 function createSignatureInformation(definition) {
     let signature = new SignatureInformation(definition.functionSignature, definition.description);
     if (definition.parameters) {
@@ -58,7 +54,6 @@ function createSignatureInformation(definition) {
     }
     return signature;
 }
-
 function calculateActiveParameter(lineText, parametersStartIndex, insertIndex) {
     let active = 0;
     let depth = 0;
@@ -66,11 +61,14 @@ function calculateActiveParameter(lineText, parametersStartIndex, insertIndex) {
         let char = lineText.charAt(i);
         if (char === '(') {
             depth++;
-        } else if (char === ')') {
+        }
+        else if (char === ')') {
             depth--;
-        } else if (char === ',' && depth === 0) {
+        }
+        else if (char === ',' && depth === 0) {
             active++;
         }
     }
     return active;
 }
+//# sourceMappingURL=mumps-signature-help-provider.js.map

@@ -1,19 +1,22 @@
 let fs = require('fs');
 let path = require('path');
-let vscode = require('vscode');
+import * as vscode from 'vscode';
+import * as autoDoc from './mumps-documenter'
 let Position = vscode.Position;
 let Location = vscode.Location;
 let Uri = vscode.Uri;
 
 const EXTENSIONS = ['.M', '.INT', '.ZWR', '.m', '.int', '.zwr'];
 
-let cache = {};
+let cache:any = {};
 
-function lookupLabelReference(token) {
+function lookupLabelReference(token):MumpsLabel{
+    console.log("here")
     let uri = token.labelProgram ?
         siblingUri(token.document, token.labelProgram) :
         token.document.uri;
     let referredTo = findReferredToLabel(getText(uri, token.document), token.label);
+    console.log(referredTo)
     if (referredTo) {
         referredTo.position = new Position(referredTo.line + (token.labelOffset || 0), 0);
     } else {
@@ -24,7 +27,6 @@ function lookupLabelReference(token) {
     referredTo.uri = uri;
     return referredTo;
 }
-exports.lookupLabelReference = lookupLabelReference;
 
 function siblingUri(document, fileName) {
     let siblingPath = path.resolve(document.uri.fsPath, '../' + fileName);
@@ -60,13 +62,26 @@ function getText(uri, document) {
     }
 }
 
-function findReferredToLabel(text, label) {
-    let labelRe = new RegExp('^' + label + '[ \t\\(].*$((\\s+;.*)*)', 'm');
-    let result = labelRe.exec(text);
-    if (result) {
+function findReferredToLabel(text:string, label):MumpsLabel {
+    let lines = text.split("\n");
+    let commentText = "";
+    for(var i = 0; i<lines.length;i++){
+        if(lines[i].match("^"+label)!=null){
+            commentText+=lines[i]+"\n";
+            for(var j = i-1; j> 0; j--){
+                if(lines[j].length == 0 || lines[j].charAt(1) == ";"){
+                    commentText+=lines[j]+"\n"
+                }else {
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    if (commentText.length > 0) {
         return {
-            text: result[0],
-            line: countLines(text, result.index)
+            text: commentText,
+            line: i
         };
     }
 }
@@ -84,7 +99,8 @@ function countLines(text, index) {
     return line;
 }
 
-function createDefinitionForLabelReference(referredTo) {
+function createDefinitionForLabelReference(referredTo:MumpsLabel) {
+    console.log("CreateLabel")
     if (!referredTo.text) {
         return;
     }
@@ -95,7 +111,7 @@ function createDefinitionForLabelReference(referredTo) {
         return;
     }
 
-    let parameters = result[2].substring(1, result[2].length - 1).split(',');
+    let parameters:any = result[2].substring(1, result[2].length - 1).split(',');
     let parametersByName = {};
     for (var i = 0; i < parameters.length; i++) {
         parameters[i] = {
@@ -109,14 +125,14 @@ function createDefinitionForLabelReference(referredTo) {
         type: 'function',
         parameters: parameters
     };
-
-    extractDescriptionFromComments(referredTo, definition, parametersByName);
-
+    
+    //extractDescriptionFromComments(referredTo, definition, parametersByName);
+    autoDoc.getSigInfo(referredTo,definition,parametersByName);
+    
     return definition;
 }
-exports.createDefinitionForLabelReference = createDefinitionForLabelReference;
 
-function extractDescriptionFromComments(referredTo, definition, parametersByName) {
+function extractDescriptionFromComments(referredTo:MumpsLabel, definition, parametersByName) {
     let commentRegex = /;[ \t]*(.*)$/gm;
     let commentText = '';
     let result;
@@ -135,7 +151,7 @@ function extractDescriptionFromComments(referredTo, definition, parametersByName
             let parameterRegex = new RegExp('^((input|output|input/output)[ \t:\\-]+)?' + name + '[ \t:\\-]+(.+)\n', 'm');
             let result = parameterRegex.exec(additionalLines);
             if (result) {
-                parametersByName[name].description = result[3];
+                parametersByName[name].description = result[3] + "ss";
                 if (result[2]) {
                     parametersByName[name].description = result[2] + parametersByName[name].description;
                 }
@@ -147,3 +163,6 @@ function extractDescriptionFromComments(referredTo, definition, parametersByName
 
     definition.description = commentText;
 }
+
+interface MumpsLabel{text?:string,line?:number,position?:vscode.Position,uri?:string}
+export {lookupLabelReference,createDefinitionForLabelReference,MumpsLabel};

@@ -1,14 +1,23 @@
-let vscode = require('vscode');
-let Position = vscode.Position;
-let Range = vscode.Range;
-let lookupLabelReference = require('./mumps-label-lookup').lookupLabelReference;
-let createDefinitionForLabelReference = require('./mumps-label-lookup').createDefinitionForLabelReference;
-const definitionsArray = require('./language-definitions.json');
+import * as vscode from 'vscode';
+import { lookupLabelReference, createDefinitionForLabelReference, MumpsLabel } from './mumps-label-lookup';
+const definitionsArray = require('./../language-definitions.json');
 
 const definitions = {};
 exports.definitions = definitions;
 
 class MumpsToken {
+    _definition: any;
+    referredToLabel:MumpsLabel;
+    labelProgram: String;
+    labelOffset: number;
+    label: string;
+    _isLabelReference: Boolean;
+    document: vscode.TextDocument;
+    position:vscode.Position;
+    range:vscode.Range;
+    word:String;
+    surroundWord:String;
+
     constructor(document, position) {
         this.document = document;
         this.position = position;
@@ -98,20 +107,20 @@ class MumpsToken {
         return this._definition;
     }
 }
-exports.MumpsToken = MumpsToken;
+
 
 function getWordWithSurrounds(document, range) {
     if (range.start.character <= 0) {
         return;
     }
-    let start = new Position(range.start.line, range.start.character - 1);
-    let end = new Position(range.end.line, range.end.character + 1);
-    let surroundWord = document.getText(new Range(start, end));
+    let start = new vscode.Position(range.start.line, range.start.character - 1);
+    let end = new vscode.Position(range.end.line, range.end.character + 1);
+    let surroundWord = document.getText(new vscode.Range(start, end));
 
     // check for two dollar signs
     if (surroundWord.charAt(0) === '$') {
-        start = new Position(start.line, start.character - 1);
-        let extendedWord = document.getText(new Range(start, end));
+        start = new vscode.Position(start.line, start.character - 1);
+        let extendedWord = document.getText(new vscode.Range(start, end));
         if (extendedWord.charAt(0) === '$') {
             surroundWord = extendedWord;
         }
@@ -165,3 +174,4 @@ for (var definition of definitionsArray) {
         addDefinition(definition.abbreviation, definition);
     }
 }
+export {MumpsToken};

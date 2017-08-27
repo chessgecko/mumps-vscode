@@ -1,11 +1,13 @@
-let vscode = require('vscode');
-let MumpsToken = require('../mumps-language-token').MumpsToken;
-const DIVIDERLINE = ";****************\n"
-var InsertPosition = "" 
-exports.DocumentFunction = () =>{
+import * as vscode from 'vscode';
+import * as MumpsToken from './mumps-language-token';
+import { MumpsLabel } from "./mumps-label-lookup";
+let em = require('emcellent');
+const DIVIDERLINE = "\t;****************\n"
+
+function DocumentFunction(){
     let editor = vscode.window.activeTextEditor
     let document = editor.document
-    InsertPosition = editor.selection.start.with(editor.selection.start.line,0)
+    let InsertPosition = editor.selection.start.with(editor.selection.start.line,0)
     
     //if the line is empty look down for the label
     while(InsertPosition.line < document.lineCount){
@@ -50,20 +52,36 @@ function makeSignature(labelLine){
   let Signature = ""
   
   Signature+=DIVIDERLINE
-  Signature+="; DESCRIPTION: \n"
+  Signature+="\t; DESCRIPTION: \n"
   let parameters = labelLine.match(/\(.*\)/)
   if(parameters != null && parameters.length> 0){
     parameters = parameters[0].substring(1, parameters[0].length-1).split(",")
     if(parameters.length > 0){
-      Signature+="; PARAMETERS: \n"
+      Signature+="\t; PARAMETERS: \n"
       parameters.forEach(function(element) {
-        Signature+=";    " + element + "(I/O,REQ): \n"
+        Signature+="\t;    " + element + "(I/O,REQ): \n"
       }, this);
     }
   }
 
-  Signature+="; RETURNS: \n"
-  Signature+="; REVISIONS: \n"
+  Signature+="\t; RETURNS: \n"
+  Signature+="\t; REVISIONS: \n"
   Signature+=DIVIDERLINE
   return Signature;
 }
+
+function getSigInfo(referredTo:MumpsLabel, definition, parametersByName){
+  console.log("GetSigInfo")
+  let description = referredTo.text.match(/DESCRIPTION:.*/i)
+  if(description!=null) definition.description = description[0];
+  console.log(definition.description)
+  console.log(parametersByName)
+
+  for(var param in parametersByName){
+    console.log(param)
+    let paramDescription = referredTo.text.match(new RegExp(param+"\\(.*\\):.*",'i'))
+    if(paramDescription != null) parametersByName[param].description=paramDescription
+  };
+}
+
+export {getSigInfo, DocumentFunction};

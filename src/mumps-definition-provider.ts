@@ -1,4 +1,4 @@
-let vscode = require('vscode');
+import * as vscode from 'vscode';
 let Location = vscode.Location;
 let Position = vscode.Position;
 let MumpsToken = require('./mumps-language-token').MumpsToken;
@@ -15,4 +15,5 @@ class MumpsDefinitionProvider {
         }
     }
 }
-exports.MumpsDefinitionProvider = MumpsDefinitionProvider;
+
+export {MumpsDefinitionProvider};
