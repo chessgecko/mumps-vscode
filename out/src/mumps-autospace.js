@@ -5,6 +5,7 @@ let em = require('emcellent');
 let tabSize = vscode.workspace.getConfiguration().get("editor.tabSize");
 var prevfin = true;
 function autoSpaceEnter() {
+    vscode.commands.executeCommand("acceptSelectedSuggestion");
     let editor = vscode.window.activeTextEditor;
     let pos = editor.selection.active;
     let currentLine = editor.document.lineAt(pos.line).text;
@@ -24,8 +25,8 @@ function autoSpaceEnter() {
         if (lineContainsNoParamDo(currentLine))
             parsed[0].lineIndentationArray.push(" ");
         parsed[0].lineRoutines = [];
-        parsed[0].lineComments = "";
-        parsed[0].lineLabel = "";
+        delete parsed[0].lineComment;
+        delete parsed[0].lineLabel;
         editor.edit((editBuilder) => {
             editBuilder.insert(pos, "\n" + em.render(parsed));
         });
@@ -81,6 +82,7 @@ function autoSpaceTab() {
     let pos = editor.selection.active;
     let currentLine = editor.document.lineAt(pos.line).text;
     let parsed = em.parse(currentLine);
+    vscode.commands.executeCommand("acceptSelectedSuggestion");
     if ((parsed[0].lineRoutines == null || parsed[0].lineRoutines.length == 0) && currentLine.indexOf(";") == -1 && parsed[0].lineIndentationArray != null && parsed[0].lineIndentationArray.length > 0) {
         parsed[0].lineIndentationArray.push(" ");
         editor.edit((editBuilder) => {

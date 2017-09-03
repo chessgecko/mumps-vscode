@@ -1,13 +1,15 @@
-# M/MUMPS/Caché language syntax for [Visual Studio Code](https://code.visualstudio.com)
+# M/MUMPS/GTM / Caché language syntax  for [Visual Studio Code](https://code.visualstudio.com)
+### Cloned from [David Gileadi's extension](Repository:https://github.com/dgileadi/mumps-language-vscode.git)
 
-This is a simple [conversion](https://code.visualstudio.com/docs/customization/colorizer#_adding-a-new-language) of the [M/MUMPS/Caché language syntax for TextMate](https://github.com/ksherlock/MUMPS.tmbundle).
-
-## Simple language hints
-
-It also shows information about functions and built-in variables. Specifically, it:
-
-* Shows hover hints for built-in commands, variables and functions. This can help newcomers who are unfamiliar with single-letter names.
-* Shows hover hints for calls to labeled code blocks. If the label has comments after it, they are used to describe it and its parameters.
-* Allows jumping to labels, in both the open file and in nearby files, using *Go to Definition*.
+## Features
+* Features I implemented
+  * Formatter that will format the first character of every line to be a tab when it isnt a label and will add comments to the end of lines if it doesnt contain any commands
+  * Automatically indents with mumps formatting when it finds a loop or you are inside a loop
+  * Added javadoc label commenting using ctrl + d
+  * Enter / tab to remove / add mumps indentation
+* Features in David Gileadi's extension
+  * Syntax / language highlighting
+  * Jumping to labels
+  * Hover hints for labeled code blocks (I changed the format)
 
 This language support is very basic (and possibly buggy) because it only does simple parsing and doesn't use a full interpreter.

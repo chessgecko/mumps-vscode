@@ -1,19 +1,20 @@
 {
   "name": "mumps",
-  "displayName": "M/MUMPS/Caché language syntax highlighting",
-  "description": "M/MUMPS/Caché language syntax highlighting for Visual Studio Code. Converted from the MUMPS TextMate Bundle.",
-  "version": "0.1.2",
-  "publisher": "dgileadi",
+  "displayName": "M/MUMPS/Caché language syntax highlighting and basic formatting",
+  "description": "M/MUMPS/Caché language syntax highlighting, basic formatting, javadoc, and autoindent",
+  "version": "0.1.1",
+  "publisher": "dsilin",
   "icon": "icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dgileadi/mumps-language-vscode.git"
+    "url": "https://github.com/chessgecko/mumps-vscode.git"
   },
   "engines": {
-    "vscode": "^1.5.0"
+    "vscode": "^1.15.0"
   },
   "categories": [
-    "Languages"
+    "Languages",
+    "Formatters"
   ],
   "contributes": {
     "languages": [
@@ -55,7 +56,8 @@
     ],
     "configurationDefaults": {
       "[mumps]": {
-        "editor.insertSpaces": false
+        "editor.insertSpaces": false,
+        "editor.formatOnSave": true
       }
     }
   },
@@ -64,8 +66,10 @@
   ],
   "main": "./out/src/extension",
   "scripts": {
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "node ./node_modules/vscode/bin/test"
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
     "typescript": "^2.0.3",
