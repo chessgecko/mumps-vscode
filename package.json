@@ -43,14 +43,17 @@
     "keybindings": [
       {
         "command": "mumps.documentFunction",
-        "key": "ctrl+d"
+        "key": "ctrl+d",
+        "when":"editorLangId == mumps"
       },
       {
         "command": "mumps.autoSpaceEnter",
+        "when":"editorLangId == mumps",
         "key": "enter"
       },
       {
         "command": "mumps.autoSpaceTab",
+        "when":"editorLangId == mumps",
         "key": "tab"
       }
     ],
