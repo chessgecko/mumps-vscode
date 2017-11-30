@@ -2,7 +2,7 @@
   "name": "mumps",
   "displayName": "M/MUMPS/Caché language syntax highlighting and basic formatting",
   "description": "M/MUMPS/Caché language syntax highlighting, basic formatting, javadoc, and autoindent",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "dsilin",
   "icon": "icon.png",
   "repository": {
