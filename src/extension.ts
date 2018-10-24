@@ -3,41 +3,56 @@ import { MumpsHoverProvider } from './mumps-hover-provider'
 import { MumpsDefinitionProvider } from './mumps-definition-provider'
 import { MumpsSignatureHelpProvider } from './mumps-signature-help-provider'
 import { DocumentFunction } from './mumps-documenter'
+import { MumpsDocumentSymbolProvider } from './mumps-document';
 import * as AutospaceFunction from './mumps-autospace'
+
+export const MUMPS_MODE: vscode.DocumentFilter = { language: 'mumps', scheme: 'file' };
 
 function activate(context) {
     context.subscriptions.push(
         vscode.languages.registerHoverProvider(
-            'mumps', new MumpsHoverProvider()));
+            MUMPS_MODE, new MumpsHoverProvider()
+        )
+    );
+    
     context.subscriptions.push(
         vscode.languages.registerDefinitionProvider(
-            'mumps', new MumpsDefinitionProvider()));
+            MUMPS_MODE, new MumpsDefinitionProvider()
+        )
+    );
+
     context.subscriptions.push(
         vscode.languages.registerSignatureHelpProvider(
-            'mumps', new MumpsSignatureHelpProvider(), '(', ','));
+            MUMPS_MODE, new MumpsSignatureHelpProvider(), '(', ','
+        )
+    );
+
     context.subscriptions.push(
         vscode.commands.registerCommand(
             "mumps.documentFunction", () => {
                 DocumentFunction();
             }
         )
-    )
+    );
+
     context.subscriptions.push(
         vscode.commands.registerCommand(
             "mumps.autoSpaceEnter", () => {
                 AutospaceFunction.autoSpaceEnter();
             }
         )
-    )
+    );
+
     context.subscriptions.push(
         vscode.commands.registerCommand(
             "mumps.autoSpaceTab", () => {
                 AutospaceFunction.autoSpaceTab();
             }
         )
-    )
+    );
+
     context.subscriptions.push(
-        vscode.languages.registerDocumentFormattingEditProvider('mumps"', {
+        vscode.languages.registerDocumentFormattingEditProvider(MUMPS_MODE, {
             provideDocumentFormattingEdits: (document, options, token) => {
                 let textEdits: vscode.TextEdit[] = []
                 for (var i = 0; i < document.lineCount; i++) {
@@ -49,7 +64,7 @@ function activate(context) {
         })
     );
 
-    context.subscriptions.push(vscode.languages.registerDocumentRangeFormattingEditProvider('mumps', {
+    context.subscriptions.push(vscode.languages.registerDocumentRangeFormattingEditProvider(MUMPS_MODE, {
         provideDocumentRangeFormattingEdits: (document, range, options, token) => {
             let textEdits: vscode.TextEdit[] = []
             for (var i = range.start.line; i <= range.end.line; i++) {
@@ -59,6 +74,13 @@ function activate(context) {
             return textEdits;
         }
     }));
+
+    // Document Symbol Outline
+    context.subscriptions.push(
+        vscode.languages.registerDocumentSymbolProvider(
+            MUMPS_MODE, new MumpsDocumentSymbolProvider()
+        )
+    );
 
     // context.subscriptions.push(AutospaceFunction)
 }
